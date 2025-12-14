@@ -1,138 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI Story Video Generator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<title>AI Story → Animation Video</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #ffffff;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
-    }
-
-    h1 {
-      color: #38bdf8;
-    }
-
-    .box {
-      max-width: 700px;
-      margin: auto;
-      background: #020617;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(56,189,248,0.2);
-    }
-
-    textarea {
-      width: 100%;
-      height: 160px;
-      border-radius: 8px;
-      border: none;
-      padding: 12px;
-      font-size: 15px;
-      resize: none;
-    }
-
-    select, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 12px;
-      border-radius: 8px;
-      border: none;
-      font-size: 16px;
-    }
-
-    button {
-      background: #38bdf8;
-      color: #020617;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #0ea5e9;
-    }
-
-    .info {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #cbd5f5;
-    }
-
-    .warning {
-      background: #1e293b;
-      padding: 12px;
-      border-radius: 8px;
-      margin-top: 15px;
-      color: #facc15;
-      font-size: 14px;
-    }
-
-    footer {
-      margin-top: 30px;
-      font-size: 13px;
-      color: #94a3b8;
-    }
-  </style>
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#0f172a;
+  color:#fff;
+  text-align:center;
+  padding:20px;
+}
+h1{
+  color:#38bdf8;
+}
+textarea{
+  width:100%;
+  max-width:600px;
+  height:150px;
+  border-radius:10px;
+  padding:15px;
+  font-size:16px;
+  border:none;
+}
+select,input{
+  margin-top:10px;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  font-size:14px;
+}
+button{
+  margin-top:20px;
+  padding:14px 30px;
+  font-size:16px;
+  border:none;
+  border-radius:10px;
+  background:#38bdf8;
+  color:#000;
+  font-weight:bold;
+}
+button:disabled{
+  background:gray;
+}
+#status{
+  margin-top:20px;
+  font-size:16px;
+  color:#facc15;
+}
+#download{
+  display:none;
+  margin-top:20px;
+}
+.info{
+  margin-top:25px;
+  font-size:14px;
+  opacity:0.9;
+}
+.popup{
+  display:none;
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.8);
+}
+.popup-content{
+  background:#020617;
+  margin:20% auto;
+  padding:20px;
+  width:80%;
+  max-width:300px;
+  border-radius:10px;
+}
+</style>
 </head>
 
 <body>
 
-  <h1>AI Story Video Generator</h1>
+<h1>AI Story → Animation Video</h1>
+<p>Apni story ka prompt likho (kisi bhi language me)</p>
 
-  <div class="box">
+<textarea id="story" placeholder="Yahan apni story likho..."></textarea>
 
-    <textarea placeholder="Write or paste your story here... (any language)"></textarea>
+<br>
 
-    <select>
-      <option selected disabled>Select video style</option>
-      <option>Anime</option>
-      <option>Cartoon</option>
-      <option>Humanity</option>
-    </select>
+<select id="type">
+  <option value="anime">Anime</option>
+  <option value="cartoon">Cartoon</option>
+  <option value="humanity">Humanity</option>
+</select>
 
-    <select>
-      <option selected disabled>Select video speed</option>
-      <option>Slow</option>
-      <option>Normal</option>
-      <option>Fast</option>
-    </select>
+<br>
 
-    <button onclick="generateVideo()">Generate Video</button>
+<label>Speed:</label>
+<input type="range" id="speed" min="0.8" max="1.2" step="0.1" value="1">
 
-    <div class="info">
-      • Maximum 10 videos in 24 hours  
-      <br>• Maximum video length: 30 minutes  
-      <br>• Language will be auto-detected from your story  
-    </div>
+<br>
 
-    <div class="warning">
-      ⚠️ Warning: Video speed should be kept natural for best results.
-      <br>⚠️ If video exceeds 30 minutes, generation may fail.
-    </div>
+<button id="generate" onclick="generateVideo()">Generate Video</button>
 
+<div id="status"></div>
+
+<div id="download">
+  <button onclick="alert('Demo mode: real video future me add hoga')">
+    Download Video
+  </button>
+</div>
+
+<div class="info">
+🎬 Video length: Max 30 minutes<br>
+🌍 Language: Prompt wali language auto use hogi<br>
+🎤 Animation + Voice auto add hogi<br>
+📅 Daily limit: 10 videos (future)
+</div>
+
+<div class="popup" id="popup">
+  <div class="popup-content">
+    <p id="popupText"></p>
+    <button onclick="closePopup()">OK</button>
   </div>
+</div>
 
-  <footer>
-    Free to use • No watermark • No login required  
-    <br>
-    Support: mhamzasheik@gmail.com
-  </footer>
+<script>
+let limit = localStorage.getItem("limit") || 0;
 
-  <script>
-    function generateVideo() {
-      alert(
-        "Video generation backend is not connected yet.\n\n" +
-        "This is a demo interface.\n\n" +
-        "Next step: Connect AI video + voice backend."
-      );
-    }
-  </script>
+function popup(msg){
+  document.getElementById("popupText").innerText = msg;
+  document.getElementById("popup").style.display="block";
+}
+function closePopup(){
+  document.getElementById("popup").style.display="none";
+}
+
+function generateVideo(){
+  const story = document.getElementById("story").value.trim();
+  if(story.length < 10){
+    popup("Please thori lambi story likho");
+    return;
+  }
+
+  if(limit >= 10){
+    popup("Daily limit reached. 24 hours baad try karein.");
+    return;
+  }
+
+  limit++;
+  localStorage.setItem("limit",limit);
+
+  document.getElementById("generate").disabled=true;
+  document.getElementById("status").innerText="🎬 Video processing...";
+  document.getElementById("download").style.display="none";
+
+  setTimeout(()=>{
+    document.getElementById("status").innerText="✅ Video ready!";
+    document.getElementById("download").style.display="block";
+    document.getElementById("generate").disabled=false;
+  },15000);
+}
+</script>
 
 </body>
 </html>

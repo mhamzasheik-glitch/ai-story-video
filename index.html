@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Story → Animation Video</title>
+<title>AI Story → Video Generator</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -14,27 +14,24 @@ body{
   text-align:center;
   padding:20px;
 }
-h1{
-  color:#38bdf8;
-}
+h1{color:#38bdf8;}
 textarea{
   width:100%;
-  max-width:600px;
-  height:150px;
-  border-radius:10px;
+  max-width:650px;
+  height:160px;
   padding:15px;
   font-size:16px;
+  border-radius:10px;
   border:none;
 }
 select,input{
-  margin-top:10px;
+  margin-top:12px;
   padding:10px;
   border-radius:8px;
   border:none;
-  font-size:14px;
 }
 button{
-  margin-top:20px;
+  margin-top:18px;
   padding:14px 30px;
   font-size:16px;
   border:none;
@@ -43,17 +40,18 @@ button{
   color:#000;
   font-weight:bold;
 }
-button:disabled{
-  background:gray;
-}
+button:disabled{background:gray;}
 #status{
   margin-top:20px;
   font-size:16px;
   color:#facc15;
 }
-#download{
+#videoBox{
   display:none;
   margin-top:20px;
+  padding:15px;
+  border:2px dashed #38bdf8;
+  border-radius:10px;
 }
 .info{
   margin-top:25px;
@@ -69,10 +67,10 @@ button:disabled{
 }
 .popup-content{
   background:#020617;
-  margin:20% auto;
+  margin:25% auto;
   padding:20px;
   width:80%;
-  max-width:300px;
+  max-width:320px;
   border-radius:10px;
 }
 </style>
@@ -81,7 +79,7 @@ button:disabled{
 <body>
 
 <h1>AI Story → Animation Video</h1>
-<p>Apni story ka prompt likho (kisi bhi language me)</p>
+<p>Story likho (kisi bhi language me)</p>
 
 <textarea id="story" placeholder="Yahan apni story likho..."></textarea>
 
@@ -100,21 +98,22 @@ button:disabled{
 
 <br>
 
-<button id="generate" onclick="generateVideo()">Generate Video</button>
+<button id="generateBtn" onclick="generateVideo()">Generate Video</button>
 
 <div id="status"></div>
 
-<div id="download">
-  <button onclick="alert('Demo mode: real video future me add hoga')">
-    Download Video
-  </button>
+<div id="videoBox">
+  <p>🎬 Video Playing (Demo)</p>
+  <p>🔊 Voice Narration Active</p>
+  <button onclick="downloadDemo()">Download Video</button>
 </div>
 
 <div class="info">
-🎬 Video length: Max 30 minutes<br>
-🌍 Language: Prompt wali language auto use hogi<br>
-🎤 Animation + Voice auto add hogi<br>
-📅 Daily limit: 10 videos (future)
+• Daily limit: 10 videos / 24h<br>
+• Max length: 30 minutes<br>
+• Language auto from story<br>
+• Voice auto added<br>
+• No watermark (demo)
 </div>
 
 <div class="popup" id="popup">
@@ -125,7 +124,14 @@ button:disabled{
 </div>
 
 <script>
-let limit = localStorage.getItem("limit") || 0;
+/* ---------- UTIL ---------- */
+let count = localStorage.getItem("count") || 0;
+let day = localStorage.getItem("day") || new Date().toDateString();
+if(day !== new Date().toDateString()){
+  count = 0;
+  localStorage.setItem("day",new Date().toDateString());
+  localStorage.setItem("count",0);
+}
 
 function popup(msg){
   document.getElementById("popupText").innerText = msg;
@@ -135,30 +141,57 @@ function closePopup(){
   document.getElementById("popup").style.display="none";
 }
 
+/* ---------- MAIN ---------- */
 function generateVideo(){
   const story = document.getElementById("story").value.trim();
-  if(story.length < 10){
+  const btn = document.getElementById("generateBtn");
+
+  if(story.length < 20){
     popup("Please thori lambi story likho");
     return;
   }
 
-  if(limit >= 10){
-    popup("Daily limit reached. 24 hours baad try karein.");
+  if(count >= 10){
+    popup("Daily limit reached (10 videos / 24h)");
     return;
   }
 
-  limit++;
-  localStorage.setItem("limit",limit);
+  // estimate length (rough)
+  const words = story.split(/\s+/).length;
+  const minutes = Math.ceil(words / 150);
+  if(minutes > 30){
+    popup("Warning: Video 30 minutes se zyada ho sakti hai");
+    return;
+  }
 
-  document.getElementById("generate").disabled=true;
-  document.getElementById("status").innerText="🎬 Video processing...";
-  document.getElementById("download").style.display="none";
+  count++;
+  localStorage.setItem("count",count);
 
+  btn.disabled = true;
+  document.getElementById("status").innerText = "⏳ Video processing...";
+  document.getElementById("videoBox").style.display="none";
+
+  // fake server delay
   setTimeout(()=>{
-    document.getElementById("status").innerText="✅ Video ready!";
-    document.getElementById("download").style.display="block";
-    document.getElementById("generate").disabled=false;
-  },15000);
+    document.getElementById("status").innerText = "✅ Video ready";
+    document.getElementById("videoBox").style.display="block";
+    btn.disabled = false;
+    playVoice(story);
+  },12000);
+}
+
+/* ---------- VOICE ---------- */
+function playVoice(text){
+  if(!window.speechSynthesis) return;
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.rate = document.getElementById("speed").value;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+}
+
+/* ---------- DOWNLOAD ---------- */
+function downloadDemo(){
+  alert("Demo mode:\nReal MP4 backend connect hone ke baad download available hoga.");
 }
 </script>
 

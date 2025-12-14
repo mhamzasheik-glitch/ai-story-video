@@ -1,63 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>AI Story Video Generator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #0f172a;
-      color: #fff;
+      color: #ffffff;
       margin: 0;
       padding: 20px;
       text-align: center;
     }
+
     h1 {
       color: #38bdf8;
     }
+
+    .box {
+      max-width: 700px;
+      margin: auto;
+      background: #020617;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(56,189,248,0.2);
+    }
+
     textarea {
       width: 100%;
-      max-width: 600px;
-      height: 120px;
-      margin-top: 15px;
-      padding: 10px;
+      height: 160px;
+      border-radius: 8px;
+      border: none;
+      padding: 12px;
+      font-size: 15px;
+      resize: none;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
       border-radius: 8px;
       border: none;
       font-size: 16px;
     }
+
     button {
-      margin-top: 20px;
-      padding: 12px 25px;
-      font-size: 16px;
       background: #38bdf8;
-      border: none;
-      border-radius: 8px;
+      color: #020617;
+      font-weight: bold;
       cursor: pointer;
     }
-    .note {
-      margin-top: 30px;
+
+    button:hover {
+      background: #0ea5e9;
+    }
+
+    .info {
+      margin-top: 15px;
       font-size: 14px;
       color: #cbd5f5;
     }
+
+    .warning {
+      background: #1e293b;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 15px;
+      color: #facc15;
+      font-size: 14px;
+    }
+
+    footer {
+      margin-top: 30px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
   </style>
 </head>
+
 <body>
 
-  <h1>AI Story → Animation Video</h1>
-  <p>Apni story ka prompt likho (kisi bhi language me)</p>
+  <h1>AI Story Video Generator</h1>
 
-  <textarea placeholder="Yahan apni story likho..."></textarea>
+  <div class="box">
 
-  <br>
-  <button>Generate Video</button>
+    <textarea placeholder="Write or paste your story here... (any language)"></textarea>
 
-  <div class="note">
-    <p>🎥 Video length: Max 30 minutes</p>
-    <p>🌍 Language: Prompt wali language auto use hogi</p>
-    <p>🎭 Animation + Voice auto add hogi</p>
-    <p>📅 Daily limit: 10 videos (future)</p>
+    <select>
+      <option selected disabled>Select video style</option>
+      <option>Anime</option>
+      <option>Cartoon</option>
+      <option>Humanity</option>
+    </select>
+
+    <select>
+      <option selected disabled>Select video speed</option>
+      <option>Slow</option>
+      <option>Normal</option>
+      <option>Fast</option>
+    </select>
+
+    <button onclick="generateVideo()">Generate Video</button>
+
+    <div class="info">
+      • Maximum 10 videos in 24 hours  
+      <br>• Maximum video length: 30 minutes  
+      <br>• Language will be auto-detected from your story  
+    </div>
+
+    <div class="warning">
+      ⚠️ Warning: Video speed should be kept natural for best results.
+      <br>⚠️ If video exceeds 30 minutes, generation may fail.
+    </div>
+
   </div>
+
+  <footer>
+    Free to use • No watermark • No login required  
+    <br>
+    Support: mhamzasheik@gmail.com
+  </footer>
+
+  <script>
+    function generateVideo() {
+      alert(
+        "Video generation backend is not connected yet.\n\n" +
+        "This is a demo interface.\n\n" +
+        "Next step: Connect AI video + voice backend."
+      );
+    }
+  </script>
 
 </body>
 </html>

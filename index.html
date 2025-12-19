@@ -103,15 +103,19 @@ button:disabled{background:gray;}
 <div id="status"></div>
 
 <div id="videoBox">
+  <video id="demoVideo" width="100%" controls>
+    <!-- Demo video (replace when backend added) -->
+    <source src="sample.mp4" type="video/mp4">
+  </video>
   <p>🎬 Video Playing</p>
-  <p>🔊 Voice synced with video</p>
+  <p>🔊 Voice Narration Active</p>
   <button onclick="downloadDemo()">Download Video</button>
 </div>
 
 <div class="info">
 • Daily limit: 10 videos / 24h<br>
 • Max length: 30 minutes<br>
-• Voice auto added<br>
+• Voice auto added (demo)<br>
 • No watermark (demo)
 </div>
 
@@ -176,7 +180,8 @@ function generateVideo(){
     document.getElementById("videoBox").style.display="block";
     btn.disabled = false;
     playVoice(story);
-  }, 8000);
+    document.getElementById("demoVideo").play();
+  }, 7000);
 }
 
 /* ---------- VOICE (SYNCED) ---------- */
@@ -184,13 +189,16 @@ function playVoice(text){
   if(!window.speechSynthesis) return;
   const utter = new SpeechSynthesisUtterance(text);
   utter.rate = document.getElementById("speed").value;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(utter);
+  // sync start with video
+  const vid = document.getElementById("demoVideo");
+  vid.onplay = () => speechSynthesis.speak(utter);
+  vid.onpause = () => speechSynthesis.cancel();
+  vid.onended = () => speechSynthesis.cancel();
 }
 
 /* ---------- DOWNLOAD ---------- */
 function downloadDemo(){
-  alert("Demo mode:\nBackend connect hone ke baad real MP4 download milega.");
+  alert("Demo mode:\nReal MP4 backend connect hone ke baad download available hoga.");
 }
 </script>
 

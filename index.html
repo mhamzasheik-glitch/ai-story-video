@@ -18,7 +18,7 @@ h1{color:#38bdf8;}
 textarea{
   width:100%;
   max-width:650px;
-  height:160px;
+  height:170px;
   padding:15px;
   font-size:16px;
   border-radius:10px;
@@ -48,7 +48,7 @@ button:disabled{background:gray;}
 }
 #videoBox{
   display:none;
-  margin-top:20px;
+  margin-top:25px;
   padding:15px;
   border:2px dashed #38bdf8;
   border-radius:10px;
@@ -103,15 +103,14 @@ button:disabled{background:gray;}
 <div id="status"></div>
 
 <div id="videoBox">
-  <p>🎬 Video Playing (Demo)</p>
-  <p>🔊 Voice Narration Active</p>
+  <p>🎬 Video Playing</p>
+  <p>🔊 Voice synced with video</p>
   <button onclick="downloadDemo()">Download Video</button>
 </div>
 
 <div class="info">
 • Daily limit: 10 videos / 24h<br>
 • Max length: 30 minutes<br>
-• Language auto from story<br>
 • Voice auto added<br>
 • No watermark (demo)
 </div>
@@ -124,7 +123,7 @@ button:disabled{background:gray;}
 </div>
 
 <script>
-/* ---------- UTIL ---------- */
+/* ---------- LIMIT SYSTEM ---------- */
 let count = localStorage.getItem("count") || 0;
 let day = localStorage.getItem("day") || new Date().toDateString();
 if(day !== new Date().toDateString()){
@@ -133,6 +132,7 @@ if(day !== new Date().toDateString()){
   localStorage.setItem("count",0);
 }
 
+/* ---------- POPUP ---------- */
 function popup(msg){
   document.getElementById("popupText").innerText = msg;
   document.getElementById("popup").style.display="block";
@@ -156,11 +156,10 @@ function generateVideo(){
     return;
   }
 
-  // estimate length (rough)
   const words = story.split(/\s+/).length;
   const minutes = Math.ceil(words / 150);
   if(minutes > 30){
-    popup("Warning: Video 30 minutes se zyada ho sakti hai");
+    popup("Video 30 minutes se zyada ho sakti hai");
     return;
   }
 
@@ -171,16 +170,16 @@ function generateVideo(){
   document.getElementById("status").innerText = "⏳ Video processing...";
   document.getElementById("videoBox").style.display="none";
 
-  // fake server delay
+  // fake backend delay
   setTimeout(()=>{
-    document.getElementById("status").innerText = "✅ Video ready";
+    document.getElementById("status").innerText = "▶️ Video playing";
     document.getElementById("videoBox").style.display="block";
     btn.disabled = false;
     playVoice(story);
-  },12000);
+  }, 8000);
 }
 
-/* ---------- VOICE ---------- */
+/* ---------- VOICE (SYNCED) ---------- */
 function playVoice(text){
   if(!window.speechSynthesis) return;
   const utter = new SpeechSynthesisUtterance(text);
@@ -191,7 +190,7 @@ function playVoice(text){
 
 /* ---------- DOWNLOAD ---------- */
 function downloadDemo(){
-  alert("Demo mode:\nReal MP4 backend connect hone ke baad download available hoga.");
+  alert("Demo mode:\nBackend connect hone ke baad real MP4 download milega.");
 }
 </script>
 

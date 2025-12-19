@@ -2,99 +2,44 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AI Story → Video Generator</title>
+<title>AI Story → Video Demo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 body{
-  margin:0;
-  font-family:Arial, sans-serif;
-  background:#0f172a;
-  color:#fff;
-  text-align:center;
+  margin:0; font-family:Arial,sans-serif;
+  background:#0f172a; color:#fff; text-align:center;
   padding:20px;
 }
 h1{color:#38bdf8;}
 textarea{
-  width:100%;
-  max-width:650px;
-  height:170px;
-  padding:15px;
-  font-size:16px;
-  border-radius:10px;
-  border:none;
+  width:100%; max-width:650px; height:150px;
+  padding:15px; font-size:16px; border-radius:10px; border:none;
 }
 select,input{
-  margin-top:12px;
-  padding:10px;
-  border-radius:8px;
-  border:none;
+  margin-top:12px; padding:10px; border-radius:8px; border:none;
 }
 button{
-  margin-top:18px;
-  padding:14px 30px;
-  font-size:16px;
-  border:none;
-  border-radius:10px;
-  background:#38bdf8;
-  color:#000;
-  font-weight:bold;
+  margin-top:18px; padding:14px 28px;
+  font-size:16px; border:none; border-radius:10px;
+  background:#38bdf8; color:#000; font-weight:bold;
 }
-button:disabled{background:gray;}
-#status{
-  margin-top:20px;
-  font-size:16px;
-  color:#facc15;
-}
-#videoBox{
-  display:none;
-  margin-top:25px;
-  padding:15px;
-  border:2px dashed #38bdf8;
-  border-radius:10px;
-}
-.info{
-  margin-top:25px;
-  font-size:14px;
-  opacity:0.9;
-}
-.popup{
-  display:none;
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  background:rgba(0,0,0,0.8);
-}
-.popup-content{
-  background:#020617;
-  margin:25% auto;
-  padding:20px;
-  width:80%;
-  max-width:320px;
-  border-radius:10px;
-}
+#status{margin-top:20px;font-size:16px;color:#facc15;}
+#videoBox{display:none;margin-top:25px;}
+video{width:100%;border-radius:10px;}
+.info{margin-top:25px;font-size:14px;opacity:0.9;}
 </style>
 </head>
 
 <body>
 
-<h1>AI Story → Animation Video</h1>
-<p>Story likho (kisi bhi language me)</p>
+<h1>AI Story → Video Demo</h1>
 
-<textarea id="story" placeholder="Yahan apni story likho..."></textarea>
-
-<br>
-
-<select id="type">
-  <option value="anime">Anime</option>
-  <option value="cartoon">Cartoon</option>
-  <option value="humanity">Humanity</option>
-</select>
+<textarea id="story" placeholder="Type your story here..."></textarea>
 
 <br>
 
-<label>Speed:</label>
-<input type="range" id="speed" min="0.8" max="1.2" step="0.1" value="1">
+<label>Voice Speed: </label>
+<input type="range" id="speed" min="0.8" max="1.4" step="0.1" value="1">
 
 <br>
 
@@ -103,31 +48,21 @@ button:disabled{background:gray;}
 <div id="status"></div>
 
 <div id="videoBox">
-  <video id="demoVideo" width="100%" controls>
-    <!-- Demo video (replace when backend added) -->
+  <video id="demoVideo" controls>
     <source src="sample.mp4" type="video/mp4">
   </video>
-  <p>🎬 Video Playing</p>
-  <p>🔊 Voice Narration Active</p>
+  <br>
   <button onclick="downloadDemo()">Download Video</button>
 </div>
 
 <div class="info">
 • Daily limit: 10 videos / 24h<br>
 • Max length: 30 minutes<br>
-• Voice auto added (demo)<br>
+• Voice synced with video demo<br>
 • No watermark (demo)
 </div>
 
-<div class="popup" id="popup">
-  <div class="popup-content">
-    <p id="popupText"></p>
-    <button onclick="closePopup()">OK</button>
-  </div>
-</div>
-
 <script>
-/* ---------- LIMIT SYSTEM ---------- */
 let count = localStorage.getItem("count") || 0;
 let day = localStorage.getItem("day") || new Date().toDateString();
 if(day !== new Date().toDateString()){
@@ -136,69 +71,58 @@ if(day !== new Date().toDateString()){
   localStorage.setItem("count",0);
 }
 
-/* ---------- POPUP ---------- */
-function popup(msg){
-  document.getElementById("popupText").innerText = msg;
-  document.getElementById("popup").style.display="block";
-}
-function closePopup(){
-  document.getElementById("popup").style.display="none";
-}
-
-/* ---------- MAIN ---------- */
 function generateVideo(){
   const story = document.getElementById("story").value.trim();
-  const btn = document.getElementById("generateBtn");
-
-  if(story.length < 20){
-    popup("Please thori lambi story likho");
+  const speed = document.getElementById("speed").value;
+  if(story.length < 15){
+    alert("Please type a longer story first");
     return;
   }
-
   if(count >= 10){
-    popup("Daily limit reached (10 videos / 24h)");
+    alert("Daily limit reached");
     return;
   }
-
   const words = story.split(/\s+/).length;
-  const minutes = Math.ceil(words / 150);
-  if(minutes > 30){
-    popup("Video 30 minutes se zyada ho sakti hai");
+  const mins = Math.ceil(words / 150);
+  if(mins > 30){
+    alert("Too long!");
     return;
   }
 
   count++;
-  localStorage.setItem("count",count);
+  localStorage.setItem("count", count);
 
-  btn.disabled = true;
-  document.getElementById("status").innerText = "⏳ Video processing...";
-  document.getElementById("videoBox").style.display="none";
+  document.getElementById("status").innerText = "⏳ Generating video...";
+  document.getElementById("videoBox").style.display = "none";
+  document.getElementById("generateBtn").disabled = true;
 
-  // fake backend delay
-  setTimeout(()=>{
-    document.getElementById("status").innerText = "▶️ Video playing";
-    document.getElementById("videoBox").style.display="block";
-    btn.disabled = false;
-    playVoice(story);
-    document.getElementById("demoVideo").play();
-  }, 7000);
+  setTimeout(() => {
+    document.getElementById("status").innerText = "▶️ Video ready";
+    document.getElementById("videoBox").style.display = "block";
+    document.getElementById("generateBtn").disabled = false;
+
+    playStoryWithVideo(story, speed);
+  }, 6000);
 }
 
-/* ---------- VOICE (SYNCED) ---------- */
-function playVoice(text){
-  if(!window.speechSynthesis) return;
+function playStoryWithVideo(text, rate){
+  const video = document.getElementById("demoVideo");
   const utter = new SpeechSynthesisUtterance(text);
-  utter.rate = document.getElementById("speed").value;
-  // sync start with video
-  const vid = document.getElementById("demoVideo");
-  vid.onplay = () => speechSynthesis.speak(utter);
-  vid.onpause = () => speechSynthesis.cancel();
-  vid.onended = () => speechSynthesis.cancel();
+  utter.rate = rate;
+
+  video.currentTime = 0;
+  video.play();
+
+  video.onplay = () => {
+    speechSynthesis.cancel();
+    speechSynthesis.speak(utter);
+  };
+  video.onpause = () => speechSynthesis.cancel();
+  video.onended = () => speechSynthesis.cancel();
 }
 
-/* ---------- DOWNLOAD ---------- */
 function downloadDemo(){
-  alert("Demo mode:\nReal MP4 backend connect hone ke baad download available hoga.");
+  alert("Demo only — backend required for real MP4.");
 }
 </script>
 
